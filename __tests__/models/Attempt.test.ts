@@ -11,6 +11,17 @@ describe('[Class]: Attempt', () => {
             expect(fn).toHaveBeenCalledTimes(1);
             expect($a.state).toBe(AttemptState.SUCCEEDED);
         })
+        test('fails silently', () => {
+            const err = new Error('fails');
+            const fn = jest.fn(() => { throw err })
+            const onErr = jest.fn((e) => { e; });
+            const $a = new Attempt(fn as any, onErr as any);
+            $a.runSync();
+            expect(fn).toHaveBeenCalledTimes(1);
+            expect(onErr).toHaveBeenCalledTimes(1);
+            expect(onErr).toHaveBeenCalledWith(err);
+            expect($a.state).toBe(AttemptState.FAILED);
+        })
     });
     
 })
