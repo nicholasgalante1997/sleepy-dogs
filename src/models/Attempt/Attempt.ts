@@ -45,7 +45,7 @@ class Attempt implements IAttempt {
       if (this.retries > this.#tryN) {
         this.#state = AttemptState.RETRYING;
         this.#tryN += 1;
-        this.run();
+        this.runSync();
         return;
       }
 

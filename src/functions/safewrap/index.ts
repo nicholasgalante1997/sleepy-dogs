@@ -2,26 +2,26 @@ import { Callback } from "../../types/Callback.js";
 import SafeInvocation from '../../models/Invoke/Invoke.js';
 import { InvocationState, RejectedAsyncExecution } from "../../types/Invoke.js";
 
-enum SafeFunctionState {
+export enum SafeFunctionState {
     FAILED,
     SUCCEEDED,
     IDLE
 }
 
-interface SafeFunctionReturnValue<R> {
+export interface SafeFunctionReturnValue<R> {
     data: R | null;
     error: Error | null;
     state: SafeFunctionState
 }
 
-interface SafeFunction<R> {
-    (): SafeFunctionReturnValue<R> | Promise<SafeFunctionReturnValue<R>>
+export interface SafeFunction<R> {
+    (...args: any[]): SafeFunctionReturnValue<R> | Promise<SafeFunctionReturnValue<R>>
 }
 
 export function safewrap<R>(callback: Callback<R> | Callback<Promise<R>>, async = false): SafeFunction<R> {
     if (async) {
-        return async function () {
-            const result = await SafeInvocation.executeAsync(callback as Callback<Promise<R>>);
+        return async function (...args: any[]) {
+            const result = await SafeInvocation.executeAsync((async () => await callback(...args)) as Callback<Promise<R>>);
             const { data, resolved } = result;
             if (resolved) {
                 return {
@@ -39,8 +39,8 @@ export function safewrap<R>(callback: Callback<R> | Callback<Promise<R>>, async 
         }
     }
 
-    return function () {
-        const result = SafeInvocation.execute(callback as Callback<R>);
+    return function (...args: any[]) {
+        const result = SafeInvocation.execute((() => callback(...args)) as Callback<R>);
         const { data, error, status } = result;
         if (status === InvocationState.FAILED) {
             return {
