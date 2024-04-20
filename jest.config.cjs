@@ -28,5 +28,6 @@ module.exports = {
   moduleNameMapper: {
       '(.+)\\.js': '$1'
   },
-  extensionsToTreatAsEsm: ['.ts']
+  extensionsToTreatAsEsm: ['.ts'],
+  testMatch: ['<rootDir>/__tests__/**/*.test.ts']
 };

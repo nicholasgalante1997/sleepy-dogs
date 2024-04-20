@@ -1,7 +1,7 @@
 import { ID } from '../../types/ID.js';
 import IOptionCache from '../../types/OptionCache.js';
 
-class OptionCache implements IOptionCache {
+export default class OptionCache implements IOptionCache {
   private _record = new Map<string, any>();
 
   private static encodeId(id: ID): string {
