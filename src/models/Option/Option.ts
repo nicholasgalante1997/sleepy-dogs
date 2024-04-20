@@ -10,10 +10,10 @@ import SafeInvocation from '../Invoke/Invoke.js';
 
 export default class Option<T> implements IOption<T> {
   state: 'idle' | 'resolved' | 'rejected' = 'idle';
+
   private readonly _callback: Callback<T | Promise<T>>;
   private _data: T | null = null;
   private _error: Error | undefined;
-
   private options: OptionConfiguration | null;
 
   constructor(
@@ -24,7 +24,7 @@ export default class Option<T> implements IOption<T> {
     this.options = options;
   }
 
-  peek() {
+  peek(): Outcome<T> {
     return {
       state: this.state,
       data: this._data,
@@ -33,10 +33,24 @@ export default class Option<T> implements IOption<T> {
   }
 
   async resolve(): Promise<Outcome<T>> {
+    if (this.checkCache()) {
+      const cached = this.useCached();
+      if (cached) {
+        this._data = cached as T | null;
+        this.state = 'resolved';
+        return {
+          state: this.state,
+          data: this._data
+        };
+      }
+    }
+
     const result = await SafeInvocation.executeAsync(
       this._callback as Callback<Promise<T>>
     );
+
     const { data, rejected, resolved } = result;
+
     if (rejected) {
       this.state = 'rejected';
       this._error = (result as RejectedAsyncExecution).error;
@@ -50,6 +64,10 @@ export default class Option<T> implements IOption<T> {
     this.state = 'resolved';
     this._data = data;
 
+    if (this.options?.cache) {
+      this.cache(data);
+    }
+
     return {
       data: this._data,
       state: this.state
@@ -57,6 +75,18 @@ export default class Option<T> implements IOption<T> {
   }
 
   resolveSync(): Outcome<T> {
+    if (this.checkCache()) {
+      const cached = this.useCached();
+      if (cached) {
+        this._data = cached as T | null;
+        this.state = 'resolved';
+        return {
+          state: this.state,
+          data: this._data
+        };
+      }
+    }
+
     const result = SafeInvocation.execute(this._callback);
     const { data, status, error } = result;
     if (status === InvocationState.FAILED || error) {
@@ -71,6 +101,10 @@ export default class Option<T> implements IOption<T> {
 
     this.state = 'resolved';
     this._data = data;
+
+    if (this.options?.cache) {
+      this.cache(data);
+    }
 
     return {
       data,
@@ -137,5 +171,34 @@ export default class Option<T> implements IOption<T> {
     }
 
     return null;
+  }
+
+  private checkCache() {
+    if (this.options?.cache) {
+      return this.options.cache.optionCache.has(this.options.cache.indexingKey);
+    }
+    return false;
+  }
+
+  private useCached<T>(): T | null {
+    if (this.checkCache()) {
+      const cached = this.options?.cache.optionCache.get<T>(
+        this.options.cache.indexingKey
+      );
+      if (cached) {
+        return cached;
+      }
+    }
+
+    return null;
+  }
+
+  cache(value: T) {
+    if (
+      this.options?.cache &&
+      this.options.cache.optionCache.get(this.options.cache.indexingKey) == null
+    ) {
+      this.options.cache.optionCache.add(this.options.cache.indexingKey, value);
+    }
   }
 }

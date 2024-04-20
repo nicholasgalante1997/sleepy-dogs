@@ -4,21 +4,14 @@ import IOptionCache from './OptionCache.js';
 
 export default interface IOption<T> {
   state: 'idle' | 'resolved' | 'rejected';
-
-  _callback: Callback<T | Promise<T>>;
-  _data: T | null;
-  _error: Error | undefined;
-
   matchSync<R>(some: SomeLike<Outcome<T>, R>, none: NoneLike<R>): R | null;
-
   match<R>(
     some: SomeLike<Outcome<T>, Promise<R>>,
     none: NoneLike<Promise<R>>
   ): Promise<R | null>;
-
   resolveSync(): Outcome<T>;
-
   resolve(): Promise<Outcome<T>>;
+  peek(): Outcome<T>;
 }
 
 export interface OptionConfiguration {

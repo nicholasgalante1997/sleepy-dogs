@@ -1,5 +1,8 @@
+import { ID } from './ID.js';
+
 export default interface IOptionCache {
-  add(id: string, outcome: any): void;
-  get<T>(id: string): T | null;
-  delete<T>(id: string): T | null;
+  add(id: ID, outcome: any): void;
+  get<T>(id: ID): T | null;
+  delete<T>(id: ID): T | null;
+  has(id: ID): boolean;
 }

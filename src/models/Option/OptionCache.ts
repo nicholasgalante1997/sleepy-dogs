@@ -19,6 +19,10 @@ class OptionCache implements IOptionCache {
     return this._record.get(OptionCache.encodeId(id));
   }
 
+  has(id: ID): boolean {
+    return this._record.has(OptionCache.encodeId(id));
+  }
+
   delete<T>(id: ID): T | null {
     const item = this._record.get(OptionCache.encodeId(id));
     if (item) {
