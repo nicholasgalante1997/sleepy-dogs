@@ -1,72 +1,13 @@
+import { SleepyLog } from '../Logger/Logger.js';
+
 import { ISignal } from '../../types/Signal/Signal.js';
-import Graph from './Graph.js';
+import { SignalGraphManagerProvider } from './GraphManager.js';
+import { SignalReferenceIdManagerProvider } from './ReferenceId.js';
+import { SignalSharedComputationContextProvider } from './SharedComputationContext.js';
+
+const slpy = SleepyLog.factory({ service: 'sleepy.Signal' });
 
 export namespace Signal {
-  /** TODO: Keys should be Symbols */
-  class SignalRefenceIdManager {
-    marker = 0;
-    getIdRef() {
-      this.marker += 1;
-      return `signal-internal-reference-${this.marker}`.repeat(1);
-    }
-  }
-
-  class SignalGraphManager {
-    graph: Graph<string>;
-    record: Map<string, Signal.State<any> | Signal.Computed<any>>;
-
-    constructor() {
-      this.graph = new Graph();
-      this.record = new Map();
-    }
-
-    registerSignal<T>(signal: Signal.State<T> | Signal.Computed<T>): void {
-      const { key } = signal;
-      this.graph.addVertex(key);
-      this.record.set(key, signal);
-    }
-
-    getSignalDependencies<T>(
-      signal: Signal.State<T> | Signal.Computed<T>
-    ): (Signal.State<any> | Signal.Computed<any>)[] {
-      const { key } = signal;
-      const edges = this.graph.getEdges(key);
-      return edges
-        .map(({ dependent }) => this.record.get(dependent))
-        .filter((dependent) => {
-          if (dependent === undefined) {
-            return false;
-          }
-
-          return (
-            dependent instanceof Signal.State ||
-            dependent instanceof Signal.Computed
-          );
-        }) as (Signal.State<any> | Signal.Computed<any>)[];
-    }
-  }
-
-  class SignalInternalStateBridge {
-    private computationContexts: Computed<any>[] = [];
-
-    inComputationContext() {
-      return this.computationContexts.length > 0
-        ? this.computationContexts.at(-1)!
-        : null;
-    }
-
-    pushToComputationContext(signal: Computed<any>) {
-      this.computationContexts.push(signal);
-    }
-
-    popOffComputationContext() {
-      if (this.computationContexts.length === 0) return;
-      const lastItem = this.computationContexts.at(-1);
-      this.computationContexts = this.computationContexts.slice(0, -1);
-      return lastItem;
-    }
-  }
-
   export class State<T> implements ISignal.IState<T> {
     public readonly key: string;
 
@@ -84,16 +25,26 @@ export namespace Signal {
       if (options?.equals) {
         this.compare = options.equals;
       }
-      const signalGraphManager = SignalGraphProvider.getInstance();
+      const signalGraphManager = SignalGraphManagerProvider.getInstance();
       signalGraphManager.registerSignal(this);
     }
 
     get(): T {
-      const bridge = SignalInternalStateBridgeProvider.getInstance();
+      const bridge = SignalSharedComputationContextProvider.getInstance();
       const context = bridge.inComputationContext();
+
       if (context !== null) {
         this.computedSubscriberMap.set(context, this.value);
+        const contextDependencies = context.getDependents();
+        if (!contextDependencies.includes(this)) {
+          const graphManager = SignalGraphManagerProvider.getInstance();
+          graphManager.graph.addEdge({
+            dependent: this.key,
+            provider: context.key
+          });
+        }
       }
+
       return this.value;
     }
 
@@ -118,14 +69,13 @@ export namespace Signal {
 
     hasMutatedSinceComputedSubsciberCall(signal: Computed<any>): boolean {
       const mostRecentProvidedValue = this.computedSubscriberMap.get(signal);
-      if (mostRecentProvidedValue === null && this.value === null) return false;
-      if (mostRecentProvidedValue === undefined && this.value === undefined)
-        return false;
-      if (this.value === null && mostRecentProvidedValue) return true;
-      if (this.value === undefined && mostRecentProvidedValue) return true;
-      if (mostRecentProvidedValue === null && this.value) return true;
-      if (mostRecentProvidedValue === undefined && this.value) return false;
       return !this.equals(this.value, mostRecentProvidedValue!);
+    }
+
+    getDependents() {
+      return SignalGraphManagerProvider.getInstance().getSignalDependencies(
+        this
+      );
     }
   }
 
@@ -146,8 +96,7 @@ export namespace Signal {
       if (options?.equals) {
         this.compare = options.equals;
       }
-
-      const signalGraphManager = SignalGraphProvider.getInstance();
+      const signalGraphManager = SignalGraphManagerProvider.getInstance();
       signalGraphManager.registerSignal(this);
     }
 
@@ -155,7 +104,7 @@ export namespace Signal {
       /**
        * Check if this invocation is within a Computed context
        */
-      const bridge = SignalInternalStateBridgeProvider.getInstance();
+      const bridge = SignalSharedComputationContextProvider.getInstance();
       const context = bridge.inComputationContext();
 
       /**
@@ -180,19 +129,35 @@ export namespace Signal {
          * of the callback is determinate (equal)
          */
         const dependencies =
-          SignalGraphProvider.getInstance().getSignalDependencies(this);
+          SignalGraphManagerProvider.getInstance().getSignalDependencies(this);
+
         const depsHaveChanged =
           dependencies
-            .map((dep) => dep.hasMutatedSinceComputedSubsciberCall(this))
+            .map((dep) => {
+              const hasMutated = dep.hasMutatedSinceComputedSubsciberCall(this);
+              return hasMutated;
+            })
             .filter(Boolean).length > 0;
+
         if (depsHaveChanged) {
           this.__lost_states__.push(this.value);
           this.value = this.cb();
+        } else {
+          slpy.log(`Signal ${this.key} is returning a cached value.`);
+          slpy.log('Value is ' + this.value);
         }
       }
 
       if (context !== null) {
         this.computedSubscriberMap.set(context, this.value);
+        const contextDependencies = context.getDependents();
+        if (!contextDependencies.includes(this)) {
+          const graphManager = SignalGraphManagerProvider.getInstance();
+          graphManager.graph.addEdge({
+            dependent: this.key,
+            provider: context.key
+          });
+        }
       }
 
       /**
@@ -208,14 +173,7 @@ export namespace Signal {
 
     hasMutatedSinceComputedSubsciberCall(signal: Computed<any>): boolean {
       const mostRecentProvidedValue = this.computedSubscriberMap.get(signal);
-      if (mostRecentProvidedValue === null && this.value === null) return true;
-      if (mostRecentProvidedValue === undefined && this.value === undefined)
-        return true;
-      if (this.value === null) return false;
-      if (this.value === undefined) return false;
-      if (mostRecentProvidedValue === null) return false;
-      if (mostRecentProvidedValue === undefined) return false;
-      return this.equals(this.value, mostRecentProvidedValue);
+      return !this.equals(this.value as any, mostRecentProvidedValue as any);
     }
 
     equals(t1: T, t2: T) {
@@ -229,38 +187,11 @@ export namespace Signal {
       if (this.value === null) return false;
       return this.equals(this.value, last as T);
     }
-  }
 
-  class SignalInternalStateBridgeProvider {
-    private static signalInternalStateBridge: SignalInternalStateBridge;
-    static getInstance() {
-      if (SignalInternalStateBridgeProvider.signalInternalStateBridge == null) {
-        SignalInternalStateBridgeProvider.signalInternalStateBridge =
-          new SignalInternalStateBridge();
-      }
-      return SignalInternalStateBridgeProvider.signalInternalStateBridge;
-    }
-  }
-
-  class SignalReferenceIdManagerProvider {
-    private static signalReferenceIdManager: SignalRefenceIdManager;
-    static getInstance() {
-      if (SignalReferenceIdManagerProvider.signalReferenceIdManager == null) {
-        SignalReferenceIdManagerProvider.signalReferenceIdManager =
-          new SignalRefenceIdManager();
-      }
-      return SignalReferenceIdManagerProvider.signalReferenceIdManager;
-    }
-  }
-
-  class SignalGraphProvider {
-    private static graphManager: SignalGraphManager;
-    static getInstance() {
-      if (SignalGraphProvider.graphManager == null) {
-        SignalGraphProvider.graphManager = new SignalGraphManager();
-      }
-
-      return SignalGraphProvider.graphManager;
+    getDependents() {
+      return SignalGraphManagerProvider.getInstance().getSignalDependencies(
+        this
+      );
     }
   }
 }

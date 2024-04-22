@@ -35,4 +35,8 @@ export default class Graph<V> implements IGraph<V> {
   getEdges(vertex: V): Relationship<V>[] {
     return this.adjacencyList.get(vertex) || [];
   }
+
+  get size() {
+    return this.adjacencyList.size;
+  }
 }

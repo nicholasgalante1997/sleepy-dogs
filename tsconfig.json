@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2022",
-        "lib": ["es2022"],
+        "lib": ["es2022", "dom"],
         "module": "nodenext",
         "moduleResolution": "nodenext",
         "rootDir": ".",
@@ -16,5 +16,5 @@
         "strict": true,
     },
     "include": ["src", "__tests__"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules"],
 }
