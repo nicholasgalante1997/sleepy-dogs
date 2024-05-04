@@ -18,8 +18,8 @@ export class SignalGraphManagerProvider {
 }
 
 export class SignalGraphManager {
-  graph: Graph<string>;
-  record: Map<string, Signal.State<any> | Signal.Computed<any>>;
+  graph: Graph<symbol>;
+  record: Map<symbol, Signal.State<any> | Signal.Computed<any>>;
 
   constructor() {
     this.graph = new Graph();

@@ -39,7 +39,7 @@ type SleepyLogOptions = {
       };
 };
 
-export namespace SleepyLog {
+export namespace Log {
   export function factory(options: SleepyLogOptions = {}) {
     return new Proxy(console, {
       get(target, property, receiver) {

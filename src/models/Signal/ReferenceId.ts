@@ -1,9 +1,7 @@
 /** TODO: Keys should be Symbols */
 export class SignalRefenceIdManager {
-  marker = 0;
   getIdRef() {
-    this.marker += 1;
-    const key = `signal-internal-reference-${this.marker}`.repeat(1);
+    const key = Symbol("signal.key");
     return key;
   }
 }
@@ -18,3 +16,5 @@ export class SignalReferenceIdManagerProvider {
     return SignalReferenceIdManagerProvider.signalReferenceIdManager;
   }
 }
+
+export class EffectReferenceIdManager {}

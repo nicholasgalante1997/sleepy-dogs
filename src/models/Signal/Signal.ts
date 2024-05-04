@@ -1,30 +1,50 @@
-import { SleepyLog } from '../Logger/Logger.js';
-
 import { ISignal } from '../../types/Signal/Signal.js';
 import { SignalGraphManagerProvider } from './GraphManager.js';
 import { SignalReferenceIdManagerProvider } from './ReferenceId.js';
 import { SignalSharedComputationContextProvider } from './SharedComputationContext.js';
 
-const slpy = SleepyLog.factory({ service: 'sleepy.Signal' });
-
 export namespace Signal {
-  export class State<T> implements ISignal.IState<T> {
-    public readonly key: string;
 
-    private __lost_states__: T[] = [];
-    private computedSubscriberMap = new Map<Computed<any>, T>();
+  abstract class BaseSignal<T> {
+    /**
+     * Used for indexing Signals in SharedComputationContext and SignalGraph
+     */
+    public readonly key: symbol;
 
-    private compare = (context: ISignal.IState<T>, t1: T, t2: T) =>
+    /**
+     * Previous states that the Signal held,
+     * through this we can derive generations
+     */
+    protected __lost_states__: T[] = [];
+
+    /**
+     * Map of dependencies, and the value that this Signal held
+     * when the dependency last requested it,
+     * can be used to determine whether a Computed signal is stale
+     */
+    protected computedSubscriberMap = new Map<Computed<any>, T>();
+
+    /**
+     * Comparative function to determine equality of unknown type (T)
+     * default is Object.is
+     */
+    protected compare = (context: ISignal.IState<T> | ISignal.IComputed<T>, t1: T, t2: T) =>
       Object.is(t1, t2);
 
-    constructor(
-      private value: T,
-      private options?: ISignal.SignalOptions<T>
-    ) {
+    constructor(options?: ISignal.SignalOptions<T>) {
       this.key = SignalReferenceIdManagerProvider.getInstance().getIdRef();
       if (options?.equals) {
         this.compare = options.equals;
       }
+    }
+  }
+
+  export class State<T> extends BaseSignal<T> implements ISignal.IState<T> {
+    constructor(
+      private value: T,
+      private options?: ISignal.SignalOptions<T>
+    ) {
+      super(options);
       const signalGraphManager = SignalGraphManagerProvider.getInstance();
       signalGraphManager.registerSignal(this);
     }
@@ -79,23 +99,14 @@ export namespace Signal {
     }
   }
 
-  export class Computed<T> implements ISignal.IComputed<T> {
-    public readonly key: string;
-    private __lost_states__: T[] = [];
-    private computedSubscriberMap = new Map<Computed<any>, T>();
-    private compare = (context: Computed<T>, t1: T, t2: T) => {
-      return Object.is(t1, t2);
-    };
-    private value: T | null = null; /** Computation is lazy */
+  export class Computed<T> extends BaseSignal<T> implements ISignal.IComputed<T> {
+    private value: T | null = null;
 
     constructor(
       public cb: (this: Computed<T>) => T,
       options?: ISignal.SignalOptions<T>
     ) {
-      this.key = SignalReferenceIdManagerProvider.getInstance().getIdRef();
-      if (options?.equals) {
-        this.compare = options.equals;
-      }
+      super(options);
       const signalGraphManager = SignalGraphManagerProvider.getInstance();
       signalGraphManager.registerSignal(this);
     }
@@ -110,7 +121,7 @@ export namespace Signal {
       /**
        * Add our invocation context to the state bridge
        */
-      bridge.pushToComputationContext(this);
+      bridge.push(this);
 
       /**
        * Report to the signal graph,
@@ -142,9 +153,6 @@ export namespace Signal {
         if (depsHaveChanged) {
           this.__lost_states__.push(this.value);
           this.value = this.cb();
-        } else {
-          slpy.log(`Signal ${this.key} is returning a cached value.`);
-          slpy.log('Value is ' + this.value);
         }
       }
 
@@ -163,7 +171,7 @@ export namespace Signal {
       /**
        * Clean up the StateBridge computation context
        */
-      bridge.popOffComputationContext();
+      bridge.pop();
 
       /**!
        * Return our computed value
@@ -193,5 +201,11 @@ export namespace Signal {
         this
       );
     }
+  }
+
+  function createEffect(effect: () => void) {}
+
+  class Effect {
+    constructor(public effect: () => void) {}
   }
 }

@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for models/Signal/Graph.ts</title>
+    <title>Code coverage report for models/Signal/SharedComputationContext.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">models/Signal</a> Graph.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">models/Signal</a> SharedComputationContext.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">84.61% </span>
+                <span class="strong">92.85% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/13</span>
+                <span class='fraction'>13/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">25% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/4</span>
+                <span class='fraction'>3/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>6/6</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
@@ -100,93 +100,78 @@
 <a name='L35'></a><a href='#L35'>35</a>
 <a name='L36'></a><a href='#L36'>36</a>
 <a name='L37'></a><a href='#L37'>37</a>
-<a name='L38'></a><a href='#L38'>38</a>
-<a name='L39'></a><a href='#L39'>39</a>
-<a name='L40'></a><a href='#L40'>40</a>
-<a name='L41'></a><a href='#L41'>41</a>
-<a name='L42'></a><a href='#L42'>42</a>
-<a name='L43'></a><a href='#L43'>43</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L38'></a><a href='#L38'>38</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import IGraph, { Relationship } from '../../types/Signal/Graph.js';
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Signal } from './Signal.js';
 &nbsp;
-export default class Graph&lt;V&gt; implements IGraph&lt;V&gt; {
-  /**
-   * Digraph - Directional Graph
-   * Each map key is a vertex of type V which is a reference to an entity in the graph,
-   * Each map value is a list of type Relationship&lt;V&gt; which expresses a relationship,
-   * that that vertex maintains to another vertex within the graph.
-   * This implementation choice is known as an adjacencyList,
-   * where each key is an entity in the graph,
-   * and each value represents a collection of edges that that vertex (key) maintains
-   */
-  private adjacencyList: Map&lt;V, Relationship&lt;V&gt;[]&gt;;
+export class SignalSharedComputationContextStack {
+  private computationContextsStack: Signal.Computed&lt;any&gt;[] = [];
 &nbsp;
-  constructor() {
-    this.adjacencyList = new Map();
+  inComputationContext() {
+    const context =
+      this.computationContextsStack.length &gt; 0
+        ? this.computationContextsStack.at(-1)!
+        : null;
+    return context;
   }
 &nbsp;
-  addVertex(vertex: V): void {
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.adjacencyList.has(vertex)) <span class="cstat-no" title="statement not covered" >return;</span>
-    this.adjacencyList.set(vertex, []);
+  push(signal: Signal.Computed&lt;any&gt;) {
+    this.computationContextsStack.push(signal);
   }
 &nbsp;
-  addEdge(relationship: Relationship&lt;V&gt;): void {
-    Object.values(relationship).forEach((vertex) =&gt; {
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (!this.adjacencyList.has(vertex)) <span class="cstat-no" title="statement not covered" >this.addVertex(vertex);</span>
-    });
-&nbsp;
-    const providingVertex = relationship.provider;
-    const dependents = this.getEdges(providingVertex);
-&nbsp;
-    this.adjacencyList.set(providingVertex, [...dependents, relationship]);
+  pop() {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.computationContextsStack.length === 0) <span class="cstat-no" title="statement not covered" >return;</span>
+    const lastItem = this.computationContextsStack.at(-1);
+    this.computationContextsStack = this.computationContextsStack.slice(0, -1);
+    return lastItem;
   }
+}
 &nbsp;
-  getEdges(vertex: V): Relationship&lt;V&gt;[] {
-    return this.adjacencyList.get(vertex) || <span class="branch-1 cbranch-no" title="branch not covered" >[];</span>
-  }
-&nbsp;
-  get size() {
-    return this.adjacencyList.size;
+export class SignalSharedComputationContextProvider {
+  private static signalInternalStateBridge: SignalSharedComputationContextStack;
+  static getInstance() {
+    if (
+      SignalSharedComputationContextProvider.signalInternalStateBridge == null
+    ) {
+      SignalSharedComputationContextProvider.signalInternalStateBridge =
+        new SignalSharedComputationContextStack();
+    }
+    return SignalSharedComputationContextProvider.signalInternalStateBridge;
   }
 }
 &nbsp;</pre></td></tr></table></pre>
