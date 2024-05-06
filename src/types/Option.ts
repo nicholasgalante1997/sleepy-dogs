@@ -20,6 +20,7 @@ export interface OptionConfiguration {
     indexingKey: ID;
     stale?: number;
   };
+  retries?: number;
 }
 
 export interface Outcome<T> {

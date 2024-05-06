@@ -1,6 +1,6 @@
 import { Callback } from '../../types/Callback.js';
-import SafeInvocation from '../../models/Invoke/Invoke.js';
 import { InvocationState, RejectedAsyncExecution } from '../../types/Invoke.js';
+import SafeInvocation from '../../models/Invoke/Invoke.js';
 
 export enum SafeFunctionState {
   FAILED,
@@ -24,6 +24,7 @@ export function safewrap<R>(
   callback: Callback<R> | Callback<Promise<R>>,
   async = false
 ): SafeFunction<R> {
+  
   if (async) {
     return async function (...args: any[]) {
       const result = await SafeInvocation.executeAsync(

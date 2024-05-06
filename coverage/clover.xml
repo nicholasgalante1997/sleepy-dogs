@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1714063784172" clover="3.2.0">
-  <project timestamp="1714063784172" name="All files">
+<coverage generated="1714972688073" clover="3.2.0">
+  <project timestamp="1714972688073" name="All files">
     <metrics statements="240" coveredstatements="203" conditionals="57" coveredconditionals="34" methods="57" coveredmethods="46" elements="354" coveredelements="283" complexity="0" loc="240" ncloc="240" packages="6" files="11" classes="11"/>
     <package name="functions.safewrap">
       <metrics statements="24" coveredstatements="15" conditionals="6" coveredconditionals="3" methods="6" coveredmethods="4"/>
@@ -13,23 +13,23 @@
         <line num="7" count="1" type="stmt"/>
         <line num="8" count="1" type="stmt"/>
         <line num="23" count="1" type="stmt"/>
-        <line num="27" count="1" type="cond" truecount="0" falsecount="1"/>
-        <line num="28" count="0" type="stmt"/>
+        <line num="28" count="1" type="cond" truecount="0" falsecount="1"/>
         <line num="29" count="0" type="stmt"/>
         <line num="30" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="33" count="0" type="cond" truecount="0" falsecount="1"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="34" count="0" type="cond" truecount="0" falsecount="1"/>
+        <line num="35" count="0" type="stmt"/>
         <line num="41" count="0" type="stmt"/>
-        <line num="49" count="1" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
         <line num="50" count="1" type="stmt"/>
         <line num="51" count="1" type="stmt"/>
         <line num="52" count="1" type="stmt"/>
-        <line num="53" count="1" type="cond" truecount="0" falsecount="1"/>
-        <line num="54" count="0" type="stmt"/>
-        <line num="61" count="1" type="stmt"/>
-        <line num="69" count="1" type="stmt"/>
+        <line num="53" count="1" type="stmt"/>
+        <line num="54" count="1" type="cond" truecount="0" falsecount="1"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+        <line num="70" count="1" type="stmt"/>
       </file>
     </package>
     <package name="models.Attempt">
@@ -123,11 +123,11 @@
       <metrics statements="5" coveredstatements="5" conditionals="1" coveredconditionals="1" methods="2" coveredmethods="2"/>
       <file name="LazySingleton.ts" path="/home/makyr-linux/arcturus/modules/sleepydogs/src/models/LazySingleton/LazySingleton.ts">
         <metrics statements="5" coveredstatements="5" conditionals="1" coveredconditionals="1" methods="2" coveredmethods="2"/>
-        <line num="9" count="3" type="cond" truecount="1" falsecount="0"/>
-        <line num="10" count="2" type="stmt"/>
-        <line num="12" count="3" type="stmt"/>
-        <line num="32" count="2" type="stmt"/>
-        <line num="35" count="1" type="stmt"/>
+        <line num="8" count="3" type="cond" truecount="1" falsecount="0"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="11" count="3" type="stmt"/>
+        <line num="31" count="2" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
       </file>
     </package>
     <package name="models.Signal">

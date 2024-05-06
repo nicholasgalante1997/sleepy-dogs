@@ -193,12 +193,18 @@ export default class Option<T> implements IOption<T> {
     return null;
   }
 
-  cache(value: T) {
+  private cache(value: T) {
     if (
       this.options?.cache &&
       this.options.cache.optionCache.get(this.options.cache.indexingKey) == null
     ) {
       this.options.cache.optionCache.add(this.options.cache.indexingKey, value);
+    }
+  }
+
+  resetCache() {
+    if (this.options?.cache && this.options.cache.optionCache.get(this.options.cache.indexingKey) == null) {
+      this.options.cache.optionCache.delete(this.options.cache.indexingKey);
     }
   }
 }
