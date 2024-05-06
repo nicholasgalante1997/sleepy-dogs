@@ -4,7 +4,6 @@ import { SignalReferenceIdManagerProvider } from './ReferenceId.js';
 import { SignalSharedComputationContextProvider } from './SharedComputationContext.js';
 
 export namespace Signal {
-
   abstract class BaseSignal<T> {
     /**
      * Used for indexing Signals in SharedComputationContext and SignalGraph
@@ -28,8 +27,7 @@ export namespace Signal {
      * Comparative function to determine equality of unknown type (T)
      * default is Object.is
      */
-    protected compare = (context: ISignal.IState<T> | ISignal.IComputed<T>, t1: T, t2: T) =>
-      Object.is(t1, t2);
+    protected compare = (context: ISignal.IState<T> | ISignal.IComputed<T>, t1: T, t2: T) => Object.is(t1, t2);
 
     constructor(options?: ISignal.SignalOptions<T>) {
       this.key = SignalReferenceIdManagerProvider.getInstance().getIdRef();
@@ -93,9 +91,7 @@ export namespace Signal {
     }
 
     getDependents() {
-      return SignalGraphManagerProvider.getInstance().getSignalDependencies(
-        this
-      );
+      return SignalGraphManagerProvider.getInstance().getSignalDependencies(this);
     }
   }
 
@@ -139,8 +135,7 @@ export namespace Signal {
          * we can reasonably assume the output
          * of the callback is determinate (equal)
          */
-        const dependencies =
-          SignalGraphManagerProvider.getInstance().getSignalDependencies(this);
+        const dependencies = SignalGraphManagerProvider.getInstance().getSignalDependencies(this);
 
         const depsHaveChanged =
           dependencies
@@ -197,9 +192,7 @@ export namespace Signal {
     }
 
     getDependents() {
-      return SignalGraphManagerProvider.getInstance().getSignalDependencies(
-        this
-      );
+      return SignalGraphManagerProvider.getInstance().getSignalDependencies(this);
     }
   }
 

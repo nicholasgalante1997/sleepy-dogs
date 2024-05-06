@@ -1,11 +1,6 @@
 import { Callback } from '../../types/Callback.js';
 import { InvocationState, RejectedAsyncExecution } from '../../types/Invoke.js';
-import IOption, {
-  NoneLike,
-  Outcome,
-  SomeLike,
-  OptionConfiguration
-} from '../../types/Option.js';
+import IOption, { NoneLike, Outcome, SomeLike, OptionConfiguration } from '../../types/Option.js';
 import SafeInvocation from '../Invoke/Invoke.js';
 
 export default class Option<T> implements IOption<T> {
@@ -16,10 +11,7 @@ export default class Option<T> implements IOption<T> {
   private _error: Error | undefined;
   private options: OptionConfiguration | null;
 
-  constructor(
-    callback: Callback<T | Promise<T>>,
-    options: OptionConfiguration | null = null
-  ) {
+  constructor(callback: Callback<T | Promise<T>>, options: OptionConfiguration | null = null) {
     this._callback = callback;
     this.options = options;
   }
@@ -45,9 +37,7 @@ export default class Option<T> implements IOption<T> {
       }
     }
 
-    const result = await SafeInvocation.executeAsync(
-      this._callback as Callback<Promise<T>>
-    );
+    const result = await SafeInvocation.executeAsync(this._callback as Callback<Promise<T>>);
 
     const { data, rejected, resolved } = result;
 
@@ -112,10 +102,7 @@ export default class Option<T> implements IOption<T> {
     };
   }
 
-  async match<R>(
-    some: SomeLike<Outcome<T>, Promise<R>>,
-    none: NoneLike<Promise<R>>
-  ): Promise<R | null> {
+  async match<R>(some: SomeLike<Outcome<T>, Promise<R>>, none: NoneLike<Promise<R>>): Promise<R | null> {
     if (some == null && none == null) return null;
     if (this.state === 'idle') {
       const outcome = await this.resolve();
@@ -182,9 +169,7 @@ export default class Option<T> implements IOption<T> {
 
   private useCached<T>(): T | null {
     if (this.checkCache()) {
-      const cached = this.options?.cache.optionCache.get<T>(
-        this.options.cache.indexingKey
-      );
+      const cached = this.options?.cache.optionCache.get<T>(this.options.cache.indexingKey);
       if (cached) {
         return cached;
       }
@@ -194,10 +179,7 @@ export default class Option<T> implements IOption<T> {
   }
 
   private cache(value: T) {
-    if (
-      this.options?.cache &&
-      this.options.cache.optionCache.get(this.options.cache.indexingKey) == null
-    ) {
+    if (this.options?.cache && this.options.cache.optionCache.get(this.options.cache.indexingKey) == null) {
       this.options.cache.optionCache.add(this.options.cache.indexingKey, value);
     }
   }

@@ -1,1 +1,1 @@
-export { default as safewrap } from './safewrap/index.js';
+export { guard, guardPromise } from './guard/index.js';

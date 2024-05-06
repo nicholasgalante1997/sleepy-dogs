@@ -8,9 +8,7 @@ import {
 } from '../../types/Invoke.js';
 
 export default class SafeInvocation {
-  static execute<T extends Callback<R>, R = any>(
-    callback: T
-  ): SuccessfulExecution<R> | FailedExecution {
+  static execute<T extends Callback<R>, R = any>(callback: T): SuccessfulExecution<R> | FailedExecution {
     let data;
     let error = null;
     let status = InvocationState.IDLE;

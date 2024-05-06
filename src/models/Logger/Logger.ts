@@ -43,23 +43,9 @@ export namespace Log {
   export function factory(options: SleepyLogOptions = {}) {
     return new Proxy(console, {
       get(target, property, receiver) {
-        const proxiedAttributes = [
-          'info',
-          'log',
-          'debug',
-          'error',
-          'warn'
-        ] as const;
-        if (
-          typeof property === 'string' &&
-          proxiedAttributes.includes(property as any)
-        ) {
-          return getProxiedLogFunction(
-            property as any,
-            options.timestamp,
-            options.service,
-            options.version
-          );
+        const proxiedAttributes = ['info', 'log', 'debug', 'error', 'warn'] as const;
+        if (typeof property === 'string' && proxiedAttributes.includes(property as any)) {
+          return getProxiedLogFunction(property as any, options.timestamp, options.service, options.version);
         }
         /** @ts-ignore */
         return Reflect.get(...arguments);
@@ -81,26 +67,15 @@ export namespace Log {
         return new Proxy(console.info.bind(console.log), {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
-            const stamp = getServiceStamp(
-              service || 'sleepy',
-              version || '1.0.0'
-            );
+            const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
             const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_GREEN};${ANSI_COLOR_SEQUENCES.WHITE}`)}${ts} ${stamp} [INFO]${getResetSequence()}`;
-            if (
-              (argArray.length === 1 && typeof argArray[0] === 'object') ||
-              typeof argArray[0] === 'function'
-            ) {
-              target(
-                `${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`
-              );
+            if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
+              target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
                 `${getAnsiSequence()(`${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_GREEN}`)}${JSON.stringify(argArray[0], null, 2)}${getResetSequence()}`
               );
               return;
-            } else if (
-              argArray.length === 1 &&
-              typeof argArray[0] === 'string'
-            ) {
+            } else if (argArray.length === 1 && typeof argArray[0] === 'string') {
               return target(`${pre} ${argArray[0]}`);
             } else {
               return target(...[pre, ...argArray]);
@@ -112,26 +87,15 @@ export namespace Log {
         return new Proxy(console.info.bind(console.info), {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
-            const stamp = getServiceStamp(
-              service || 'sleepy',
-              version || '1.0.0'
-            );
+            const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
             const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_GREEN};${ANSI_COLOR_SEQUENCES.WHITE}`)}${ts} ${stamp} [INFO]${getResetSequence()}`;
-            if (
-              (argArray.length === 1 && typeof argArray[0] === 'object') ||
-              typeof argArray[0] === 'function'
-            ) {
-              target(
-                `${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`
-              );
+            if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
+              target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
                 `${getAnsiSequence()(`${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_GREEN}`)}${JSON.stringify(argArray[0], null, 2)}${getResetSequence()}`
               );
               return;
-            } else if (
-              argArray.length === 1 &&
-              typeof argArray[0] === 'string'
-            ) {
+            } else if (argArray.length === 1 && typeof argArray[0] === 'string') {
               return target(`${pre} ${argArray[0]}`);
             } else {
               return target(...[pre, ...argArray]);
@@ -143,26 +107,15 @@ export namespace Log {
         return new Proxy(console.info.bind(console.warn), {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
-            const stamp = getServiceStamp(
-              service || 'sleepy',
-              version || '1.0.0'
-            );
+            const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
             const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_YELLOW};${ANSI_COLOR_SEQUENCES.BLACK}`)}${ts} ${stamp} [WARN]${getResetSequence()}`;
-            if (
-              (argArray.length === 1 && typeof argArray[0] === 'object') ||
-              typeof argArray[0] === 'function'
-            ) {
-              target(
-                `${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`
-              );
+            if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
+              target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
                 `${getAnsiSequence()(`${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_GREEN}`)}${JSON.stringify(argArray[0], null, 2)}${getResetSequence()}`
               );
               return;
-            } else if (
-              argArray.length === 1 &&
-              typeof argArray[0] === 'string'
-            ) {
+            } else if (argArray.length === 1 && typeof argArray[0] === 'string') {
               return target(`${pre} ${argArray[0]}`);
             } else {
               return target(...[pre, ...argArray]);
@@ -174,26 +127,15 @@ export namespace Log {
         return new Proxy(console.info.bind(console.error), {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
-            const stamp = getServiceStamp(
-              service || 'sleepy',
-              version || '1.0.0'
-            );
+            const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
             const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_RED};${ANSI_COLOR_SEQUENCES.WHITE}`)}${ts} ${stamp} [ERROR]${getResetSequence()}`;
-            if (
-              (argArray.length === 1 && typeof argArray[0] === 'object') ||
-              typeof argArray[0] === 'function'
-            ) {
-              target(
-                `${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`
-              );
+            if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
+              target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
                 `${getAnsiSequence()(`${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_GREEN}`)}${JSON.stringify(argArray[0], null, 2)}${getResetSequence()}`
               );
               return;
-            } else if (
-              argArray.length === 1 &&
-              typeof argArray[0] === 'string'
-            ) {
+            } else if (argArray.length === 1 && typeof argArray[0] === 'string') {
               return target(`${pre} ${argArray[0]}`);
             } else {
               return target(...[pre, ...argArray]);
@@ -205,26 +147,15 @@ export namespace Log {
         return new Proxy(console.info.bind(console.debug), {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
-            const stamp = getServiceStamp(
-              service || 'sleepy',
-              version || '1.0.0'
-            );
+            const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
             const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_BLUE};${ANSI_COLOR_SEQUENCES.WHITE}`)}${ts} ${stamp} [DEBUG]${getResetSequence()}`;
-            if (
-              (argArray.length === 1 && typeof argArray[0] === 'object') ||
-              typeof argArray[0] === 'function'
-            ) {
-              target(
-                `${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`
-              );
+            if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
+              target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
                 `${getAnsiSequence()(`${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_GREEN}`)}${JSON.stringify(argArray[0], null, 2)}${getResetSequence()}`
               );
               return;
-            } else if (
-              argArray.length === 1 &&
-              typeof argArray[0] === 'string'
-            ) {
+            } else if (argArray.length === 1 && typeof argArray[0] === 'string') {
               return target(`${pre} ${argArray[0]}`);
             } else {
               return target(...[pre, ...argArray]);

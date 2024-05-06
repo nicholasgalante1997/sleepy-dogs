@@ -4,10 +4,7 @@ export class SignalSharedComputationContextStack {
   private computationContextsStack: Signal.Computed<any>[] = [];
 
   inComputationContext() {
-    const context =
-      this.computationContextsStack.length > 0
-        ? this.computationContextsStack.at(-1)!
-        : null;
+    const context = this.computationContextsStack.length > 0 ? this.computationContextsStack.at(-1)! : null;
     return context;
   }
 
@@ -26,11 +23,8 @@ export class SignalSharedComputationContextStack {
 export class SignalSharedComputationContextProvider {
   private static signalInternalStateBridge: SignalSharedComputationContextStack;
   static getInstance() {
-    if (
-      SignalSharedComputationContextProvider.signalInternalStateBridge == null
-    ) {
-      SignalSharedComputationContextProvider.signalInternalStateBridge =
-        new SignalSharedComputationContextStack();
+    if (SignalSharedComputationContextProvider.signalInternalStateBridge == null) {
+      SignalSharedComputationContextProvider.signalInternalStateBridge = new SignalSharedComputationContextStack();
     }
     return SignalSharedComputationContextProvider.signalInternalStateBridge;
   }

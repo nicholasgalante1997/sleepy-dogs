@@ -29,16 +29,16 @@ yarn add sleepydogs
 
 > sleepydogs module collection is largely going to be divided into two sections: Functional Programming paradigms and Object Oriented Programming paradigms. These will be denoted as fp and oop.
 
-### fp: safewrap  
+### fp: guard
 
 Intended Usage: Reduce boilerplate around exception handling.
 
 ```js
 import { readFileSync } from 'node:fs';
-import { safewrap } from 'sleepydogs';
+import { guard } from 'sleepydogs';
 
 /** Wrap a function that might fail in safewrap */
-const safeReadFile = safewrap(readFileSync);
+const safeReadFile = guard(readFileSync);
 
 /**
  * data contains file contents if it exists

@@ -44,10 +44,7 @@ export class SignalGraphManager {
           return false;
         }
 
-        return (
-          dependent instanceof Signal.State ||
-          dependent instanceof Signal.Computed
-        );
+        return dependent instanceof Signal.State || dependent instanceof Signal.Computed;
       }) as (Signal.State<any> | Signal.Computed<any>)[];
 
     return dependencies;

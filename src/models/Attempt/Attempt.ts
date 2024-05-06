@@ -1,5 +1,5 @@
 import IAttempt, { AttemptState } from '../../types/Attempt.js';
-import { SideEffect } from '../../types/Callback.js';
+import { Callback, SideEffect } from '../../types/Callback.js';
 
 import SafeInvocation from '../Invoke/Invoke.js';
 import { InvocationState, RejectedAsyncExecution } from '../../types/Invoke.js';
@@ -13,12 +13,7 @@ class Attempt implements IAttempt {
   immediate: boolean;
   retries: number;
 
-  constructor(
-    callback: SideEffect,
-    onError: SideEffect | null = null,
-    immediate = false,
-    retries = 0
-  ) {
+  constructor(callback: SideEffect, onError: SideEffect | null = null, immediate = false, retries = 0) {
     this.callback = callback;
     this.onError = onError;
     this.immediate = immediate;
@@ -67,7 +62,7 @@ class Attempt implements IAttempt {
       return;
     }
 
-    await SafeInvocation.executeAsync(this.callback).then(async (result) => {
+    await SafeInvocation.executeAsync(this.callback as Callback<Promise<void>>).then(async (result) => {
       const { rejected } = result;
       if (rejected) {
         const { error } = result as RejectedAsyncExecution;
