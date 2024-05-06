@@ -68,7 +68,7 @@ export namespace Log {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
             const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
-            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_GREEN};${ANSI_COLOR_SEQUENCES.WHITE}`)}${ts} ${stamp} [INFO]${getResetSequence()}`;
+            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_BLUE}`)}${ts} ${stamp} [INFO]${getResetSequence()}`;
             if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
               target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
@@ -88,7 +88,7 @@ export namespace Log {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
             const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
-            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_GREEN};${ANSI_COLOR_SEQUENCES.WHITE}`)}${ts} ${stamp} [INFO]${getResetSequence()}`;
+            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_BLUE}`)}${ts} ${stamp} [INFO]${getResetSequence()}`;
             if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
               target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
@@ -108,7 +108,7 @@ export namespace Log {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
             const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
-            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_YELLOW};${ANSI_COLOR_SEQUENCES.BLACK}`)}${ts} ${stamp} [WARN]${getResetSequence()}`;
+            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_YELLOW}`)}${ts} ${stamp} [WARN]${getResetSequence()}`;
             if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
               target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
@@ -128,7 +128,7 @@ export namespace Log {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
             const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
-            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_RED};${ANSI_COLOR_SEQUENCES.WHITE}`)}${ts} ${stamp} [ERROR]${getResetSequence()}`;
+            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_RED}`)}${ts} ${stamp} [ERROR]${getResetSequence()}`;
             if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
               target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
@@ -148,7 +148,7 @@ export namespace Log {
           apply(target, thisArg, argArray) {
             const ts = getTimestamp(timestamp);
             const stamp = getServiceStamp(service || 'sleepy', version || '1.0.0');
-            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_BACKGROUND_BLUE};${ANSI_COLOR_SEQUENCES.WHITE}`)}${ts} ${stamp} [DEBUG]${getResetSequence()}`;
+            const pre = `${getAnsiSequence()(`${ANSI_TEXT_SEQUENCES.BOLD};${ANSI_COLOR_SEQUENCES.HIGH_INTENSITY_FOREGROUND_GREEN}`)}${ts} ${stamp} [DEBUG]${getResetSequence()}`;
             if ((argArray.length === 1 && typeof argArray[0] === 'object') || typeof argArray[0] === 'function') {
               target(`${pre} ${argArray[0]?.constructor?.name || argArray[0]?.toString() || '[Object object]'}`);
               target(
@@ -182,6 +182,6 @@ export namespace Log {
   }
 
   function getServiceStamp(service: string, version: string | number) {
-    return `(${service} / version: ${version})`;
+    return `(${service} / ${version})`;
   }
 }
