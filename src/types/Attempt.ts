@@ -8,6 +8,14 @@ export enum AttemptState {
   RETRYING
 }
 
+export interface AttemptConfiguration {
+  callback: SideEffect;
+  onError?: ((e: Error) => void) | null;
+  immediate?: boolean;
+  retries?: number;
+  delay?: number | number[];
+};
+
 interface IAttempt {
   /**
    * @private
@@ -28,6 +36,9 @@ interface IAttempt {
 
   /** Retry the callback up to N times. Default is 0 (i.e. not to retry) */
   retries: number;
+
+   /** Delay retry of the callback */
+  delay: number | number[];
 
   /**
    * Executes a function (async or sync) that might throw an error.

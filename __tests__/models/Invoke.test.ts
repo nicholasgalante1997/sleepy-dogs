@@ -9,7 +9,7 @@ describe('[Class]: SafeInvocation', () => {
             const { data, error, status } = SafeInvocation.execute(fn);
             expect(fn).toHaveBeenCalledTimes(1);
             expect(data).toBe(num);
-            expect(error).toBeNull();
+            expect(error).toBeUndefined();
             expect(status).toBe(InvocationState.SUCCESS);
         });
         test('fails', () => {

@@ -1,4 +1,4 @@
-import IAttempt, { AttemptState } from '../../types/Attempt.js';
+import IAttempt, { AttemptConfiguration, AttemptState } from '../../types/Attempt.js';
 import { Callback, SideEffect } from '../../types/Callback.js';
 
 import SafeInvocation from '../Invoke/Invoke.js';
@@ -12,19 +12,29 @@ class Attempt implements IAttempt {
   onError: ((e: Error) => void) | null;
   immediate: boolean;
   retries: number;
+  delay: number | number[];
 
-  constructor(callback: SideEffect, onError: SideEffect | null = null, immediate = false, retries = 0) {
-    this.callback = callback;
-    this.onError = onError;
-    this.immediate = immediate;
-    this.retries = retries;
+  constructor(value: AttemptConfiguration | SideEffect) {
+    if (isAttemptConfiguration(value)) {
+      this.callback = value.callback;
+      this.onError = value.onError ?? null;
+      this.immediate = !!value?.immediate;
+      this.retries = value?.retries ?? 0;
+      this.delay = value?.delay ?? 0;
+    } else {
+      this.callback = value;
+      this.onError = null;
+      this.immediate = false;
+      this.retries = 0;
+      this.delay = 0;
+    }
 
     if (this.immediate) {
       this.runSync();
     }
   }
 
-  runSync(): void {
+  runSync(...args: any[]): void {
     this.#state = AttemptState.IN_PROGRESS;
 
     if (this.callback == null) {
@@ -32,7 +42,7 @@ class Attempt implements IAttempt {
       return;
     }
 
-    const { status, error } = SafeInvocation.execute(this.callback);
+    const { status, error } = SafeInvocation.execute(() => this.callback(...args));
 
     if (status === InvocationState.FAILED) {
       this.#state = AttemptState.FAILED;
@@ -40,8 +50,15 @@ class Attempt implements IAttempt {
       if (this.retries > this.#tryN) {
         this.#state = AttemptState.RETRYING;
         this.#tryN += 1;
-        this.runSync();
-        return;
+
+        if (Array.isArray(this.delay)) {
+          setTimeout(this.runSync, this.delay[this.#tryN] ?? 0)
+        } else if (this.delay > 0) {
+          setTimeout(this.runSync, this.delay)
+        } else {
+          this.runSync();
+          return;
+        }
       }
 
       if (this.onError) {
@@ -54,7 +71,7 @@ class Attempt implements IAttempt {
     this.#state = AttemptState.SUCCEEDED;
   }
 
-  async run(): Promise<void> {
+  async run(...args: any[]): Promise<void> {
     this.#state = AttemptState.IN_PROGRESS;
 
     if (this.callback == null) {
@@ -62,7 +79,7 @@ class Attempt implements IAttempt {
       return;
     }
 
-    await SafeInvocation.executeAsync(this.callback as Callback<Promise<void>>).then(async (result) => {
+    await SafeInvocation.executeAsync(async () => await (this.callback as Callback<Promise<void>>)(...args)).then(async (result) => {
       const { rejected } = result;
       if (rejected) {
         const { error } = result as RejectedAsyncExecution;
@@ -72,8 +89,15 @@ class Attempt implements IAttempt {
         if (this.retries > this.#tryN) {
           this.#state = AttemptState.RETRYING;
           this.#tryN += 1;
-          await this.run();
-          return;
+
+          if (Array.isArray(this.delay)) {
+            setTimeout(async () => await this.run(), this.delay[this.#tryN] ?? 0)
+          } else if (this.delay > 0) {
+            setTimeout(async () => await this.run(), this.delay)
+          } else {
+            await this.run();
+            return;
+          }
         }
 
         if (this.onError) {
@@ -90,6 +114,34 @@ class Attempt implements IAttempt {
   get state() {
     return this.#state;
   }
+}
+
+function isAttemptConfiguration(value: SideEffect | AttemptConfiguration): value is AttemptConfiguration {
+  if (typeof value === 'function') return false;
+  if (typeof value?.callback !== "undefined") {
+    if (typeof value.callback !== "function") {
+      return false;
+    }
+  }
+  if (typeof value?.onError !== "undefined") {
+    if (typeof value?.onError !== "function") {
+      return false;
+    }
+  }
+  if (typeof value?.retries !== "undefined") {
+    if (typeof value?.retries !== "number") {
+      return false;
+    }
+  }
+  if (typeof value?.delay !== "undefined") {
+    const notNumber = typeof value?.delay !== "number";
+    const notArray = !Array.isArray(value);
+
+    if (notNumber && notArray) {
+      return false;
+    }
+  }
+  return true;
 }
 
 export { Attempt, AttemptState };

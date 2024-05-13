@@ -6,13 +6,12 @@ export enum InvocationState {
 
 export interface ExecutionResult<T> {
   data: T | null;
-  error: Error | null;
+  error?: Error;
   status: InvocationState;
 }
 
 export interface SuccessfulExecution<T> extends ExecutionResult<T> {
   data: T;
-  error: null;
   status: InvocationState.SUCCESS;
 }
 
@@ -29,13 +28,13 @@ export interface AsyncExecution<T> {
   rejected: boolean;
 }
 
-export interface ResolvedAsyncExecution<T> {
+export interface ResolvedAsyncExecution<T> extends AsyncExecution<T> {
   data: T;
   resolved: true;
   rejected: false;
 }
 
-export interface RejectedAsyncExecution {
+export interface RejectedAsyncExecution extends AsyncExecution<never> {
   data: null;
   error: Error;
   resolved: false;

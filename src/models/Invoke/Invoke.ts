@@ -10,37 +10,16 @@ import {
 export default class SafeInvocation {
   static execute<T extends Callback<R>, R = any>(callback: T): SuccessfulExecution<R> | FailedExecution {
     let data;
-    let error = null;
     let status = InvocationState.IDLE;
     try {
       data = callback();
       status = InvocationState.SUCCESS;
       return {
         data,
-        error,
         status
       };
     } catch (e: unknown) {
-      data = null;
-      status = InvocationState.FAILED;
-
-      if (e instanceof Error) {
-        error = e;
-      }
-
-      if (typeof e === 'string') {
-        error = new Error(e);
-      }
-
-      if (error == null) {
-        error = new Error('UnknownException');
-      }
-
-      return {
-        data,
-        error,
-        status
-      };
+      return this.#handleException(e, 'sync') as FailedExecution;
     }
   }
 
@@ -60,16 +39,38 @@ export default class SafeInvocation {
         rejected
       };
     } catch (e) {
-      resolved = false;
-      data = null;
-      rejected = true;
-      let error = e instanceof Error ? e : new Error(JSON.stringify(e));
+      return this.#handleException(e, 'async') as RejectedAsyncExecution;
+    }
+  }
+
+  static #handleException(e: unknown, invokee: 'sync' | 'async'): FailedExecution | RejectedAsyncExecution {
+    let error = null;
+    
+    if (e instanceof Error) {
+      error = e;
+    }
+
+    if (typeof e === 'string') {
+      error = new Error(e);
+    }
+
+    if (error == null) {
+      error = new Error('UnknownException');
+    }
+
+    if (invokee === 'sync') {
       return {
-        resolved,
-        rejected,
-        data,
-        error
-      };
+        data: null,
+        error,
+        status: InvocationState.FAILED
+      } as FailedExecution;
+    } else {
+      return {
+        data: null,
+        error,
+        rejected: true,
+        resolved: false
+      } as RejectedAsyncExecution;
     }
   }
 }

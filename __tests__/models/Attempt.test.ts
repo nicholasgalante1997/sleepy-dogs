@@ -5,7 +5,7 @@ describe('[Class]: Attempt', () => {
         test('passes', () => {
             let num = 22;
             const fn = jest.fn(() => { num += 1; });
-            const $a = new Attempt(fn as any);
+            const $a = new Attempt(fn);
             $a.runSync();
             expect(num).toBe(23);
             expect(fn).toHaveBeenCalledTimes(1);
@@ -15,7 +15,10 @@ describe('[Class]: Attempt', () => {
             const err = new Error('fails');
             const fn = jest.fn(() => { throw err })
             const onErr = jest.fn((e) => { e; });
-            const $a = new Attempt(fn as any, onErr as any);
+            const $a = new Attempt({
+                callback: fn,
+                onError: onErr
+            });
             $a.runSync();
             expect(fn).toHaveBeenCalledTimes(1);
             expect(onErr).toHaveBeenCalledTimes(1);
@@ -23,9 +26,11 @@ describe('[Class]: Attempt', () => {
             expect($a.state).toBe(AttemptState.FAILED);
         })
         test('invokes a synchronous callback immediately if instantiated with the "immediate" flag.', () => {
-            let num = 4;
-            const fn = jest.fn(() => num);
-            const $a = new Attempt(fn as any, null, true);
+            const fn = jest.fn(() => {});
+            const $a = new Attempt({
+                callback: fn,
+                immediate: true
+            });
 
             expect(fn).toHaveBeenCalledTimes(1);
             expect($a.state).toBe(AttemptState.SUCCEEDED);
@@ -40,8 +45,13 @@ describe('[Class]: Attempt', () => {
                 }
             })
 
-            const $a = new Attempt(fn as any, null, false, 2);
+            const $a = new Attempt({
+                callback: fn,
+                retries: 2
+            });
+
             $a.runSync();
+
             expect(fn).toHaveBeenCalledTimes(2);
             expect($a.state).toBe(AttemptState.SUCCEEDED);
         })
@@ -60,7 +70,10 @@ describe('[Class]: Attempt', () => {
             const err = new Error('fails');
             const fn = jest.fn(async () => { throw err })
             const onErr = jest.fn((e) => { e; });
-            const $a = new Attempt(fn as any, onErr as any);
+            const $a = new Attempt({
+                callback: fn,
+                onError: onErr,
+            });
             await $a.run();
             expect(fn).toHaveBeenCalledTimes(1);
             expect(onErr).toHaveBeenCalledTimes(1);
@@ -77,8 +90,13 @@ describe('[Class]: Attempt', () => {
                 }
             })
 
-            const $a = new Attempt(fn as any, null, false, 2);
+            const $a = new Attempt({
+                callback: fn,
+                retries: 2
+            });
+
             await $a.run();
+            
             expect(fn).toHaveBeenCalledTimes(2);
             expect($a.state).toBe(AttemptState.SUCCEEDED);
         })
