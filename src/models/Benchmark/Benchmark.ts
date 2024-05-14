@@ -3,18 +3,19 @@ import Timer from '../Timer/Timer.js';
 
 class Benchmark {
 
-    timer = new Timer();
+    private timer = new Timer();
 
-    runDurations: (number | null)[] = [];
-    currentRun = 0;
+    private runDurations: (number | null)[] = [];
+    private currentRun = 0;
 
     constructor(
         private fn: Callback<any>,
-        private count: number
+        private iterations: number,
+        private precision: number = 10
     ) {}
 
     runSync() {
-        for (;this.currentRun <= this.count; this.currentRun++) {
+        for (;this.currentRun < this.iterations; this.currentRun++) {
             this.timer.start();
             this.fn();
             this.timer.stop();
@@ -25,7 +26,7 @@ class Benchmark {
     }
 
     async runAsync() {
-        for (;this.currentRun <= this.count; this.currentRun++) {
+        for (;this.currentRun <= this.iterations; this.currentRun++) {
             this.timer.start();
             await this.fn();
             this.timer.stop();
@@ -38,7 +39,7 @@ class Benchmark {
     get average () {
         const some = this.runDurations.filter(item => typeof item === 'number');
         const total = some.reduce((total, next) => total! += next!, 0);
-        return parseFloat((total! / some.length).toFixed(3));
+        return parseFloat((total! / some.length).toFixed(this.precision));
     }
 
     prettyPrint() {
