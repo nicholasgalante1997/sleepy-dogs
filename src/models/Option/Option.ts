@@ -10,6 +10,7 @@ export default class Option<T> implements IOption<T> {
   private _data: T | null = null;
   private _error: Error | undefined;
   private options: OptionConfiguration | null;
+  private tryN = 0;
 
   constructor(callback: Callback<T | Promise<T>>, options: OptionConfiguration | null = null) {
     this._callback = callback;
@@ -24,7 +25,7 @@ export default class Option<T> implements IOption<T> {
     };
   }
 
-  async resolve(): Promise<Outcome<T>> {
+  async resolve(...args: any[]): Promise<Outcome<T>> {
     if (this.checkCache()) {
       const cached = this.useCached();
       if (cached) {
@@ -37,13 +38,19 @@ export default class Option<T> implements IOption<T> {
       }
     }
 
-    const result = await SafeInvocation.executeAsync(this._callback as Callback<Promise<T>>);
+    const result = await SafeInvocation.executeAsync(this._callback.bind(this, ...args) as Callback<Promise<T>>);
 
     const { data, rejected, resolved } = result;
 
     if (rejected) {
       this.state = 'rejected';
       this._error = (result as RejectedAsyncExecution).error;
+
+      if (this.options?.retries && this.options.retries > this.tryN) {
+        this.tryN += 1;
+        return await this.resolve(...args);
+      }
+
       return {
         state: this.state,
         data: null,
@@ -64,7 +71,7 @@ export default class Option<T> implements IOption<T> {
     };
   }
 
-  resolveSync(): Outcome<T> {
+  resolveSync(...args: any[]): Outcome<T> {
     if (this.checkCache()) {
       const cached = this.useCached();
       if (cached) {
@@ -77,11 +84,17 @@ export default class Option<T> implements IOption<T> {
       }
     }
 
-    const result = SafeInvocation.execute(this._callback);
+    const result = SafeInvocation.execute(this._callback.bind(this, ...args));
     const { data, status, error } = result;
     if (status === InvocationState.FAILED || error) {
       this.state = 'rejected';
       this._error = error;
+
+      if (this.options?.retries && this.options.retries > this.tryN) {
+        this.tryN += 1;
+        return this.resolveSync(...args);
+      }
+
       return {
         error: this._error,
         state: this.state,

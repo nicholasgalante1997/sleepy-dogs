@@ -52,11 +52,11 @@ class Attempt implements IAttempt {
         this.#tryN += 1;
 
         if (Array.isArray(this.delay)) {
-          setTimeout(this.runSync, this.delay[this.#tryN] ?? 0)
+          setTimeout(this.runSync.bind(this, ...args), this.delay[this.#tryN] ?? 0)
         } else if (this.delay > 0) {
-          setTimeout(this.runSync, this.delay)
+          setTimeout(this.runSync.bind(this, ...args), this.delay)
         } else {
-          this.runSync();
+          this.runSync(...args);
           return;
         }
       }
@@ -91,11 +91,11 @@ class Attempt implements IAttempt {
           this.#tryN += 1;
 
           if (Array.isArray(this.delay)) {
-            setTimeout(async () => await this.run(), this.delay[this.#tryN] ?? 0)
+            setTimeout(this.run.bind(this, ...args), this.delay[this.#tryN] ?? 0)
           } else if (this.delay > 0) {
-            setTimeout(async () => await this.run(), this.delay)
+            setTimeout(this.run.bind(this, ...args), this.delay)
           } else {
-            await this.run();
+            await this.run(...args);
             return;
           }
         }
