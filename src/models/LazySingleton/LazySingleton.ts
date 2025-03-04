@@ -1,34 +1,90 @@
+/**
+ * A type representing a constructable class.
+ * @template T
+ */
 type Constructable<T = {}> = new (...args: any[]) => T;
-type ILazySingleton<T> = {};
 
-function SingletonFactory<T1>(BaseClass: Constructable<T1>) {
-  class LazySingleton<T2 extends typeof BaseClass> implements ILazySingleton<T2> {
-    static #instance: T1 | null;
-    static getInstance(...args: any[]) {
-      if (LazySingleton.#instance == null) {
-        LazySingleton.#instance = new BaseClass(...args);
+/**
+ * The Laziest Singleton class
+ * Used for constructing more lazy instance managers
+ * @template T
+ */
+abstract class SuperLazySingleton<T> {
+  /**
+   * The singleton instance.
+   * @protected
+   * @type {T | null}
+   */
+  protected abstract instance: T | null;
+
+  /**
+   * The arguments for creating the instance. Optional
+   * @protected
+   * @type {any[]}
+   */
+  protected abstract args: any[];
+
+  /**
+   * Sets the arguments for creating the instance.
+   * @param {...any[]} args
+   */
+  public abstract setInstanceArgs(...args: any[]): SuperLazySingleton<T>;
+
+  /**
+   * Gets the singleton instance. If not yet created, it will be created with the previously set arguments.
+   * @returns {T}
+   */
+  public abstract getInstance(): T;
+}
+
+/**
+ * A factory function to create a lazy singleton class.
+ * @template T1
+ * @param {Constructable<T1>} BaseClass
+ * @returns {SuperLazySingleton<T1>}
+ */
+function LazySingletonFactory<T1>(BaseClass: Constructable<T1>): SuperLazySingleton<T1> {
+  class LazySingleton extends SuperLazySingleton<T1> implements SuperLazySingleton<T1> {
+    /**
+     * @protected
+     * @type {T1 | null}
+     */
+    protected instance: T1 | null;
+
+    /**
+     * @protected
+     * @type {any[]}
+     */
+    protected args: any[];
+
+    constructor() {
+      super();
+      this.instance = null;
+      this.args = [];
+    }
+
+    /**
+     * Sets the arguments for creating the instance.
+     * @param {...any[]} args
+     */
+    public setInstanceArgs(...args: any[]) {
+      this.args = args;
+      return this;
+    }
+
+    /**
+     * Gets the singleton instance.
+     * @returns {T1}
+     */
+    public getInstance(): T1 {
+      if (this.instance == null) {
+        this.instance = new BaseClass(...this.args);
       }
-      return LazySingleton.#instance;
+      return this.instance;
     }
   }
 
-  /**
-   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/constructor#changing_the_constructor_of_a_constructor_functions_prototype
-   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create
-   * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/setPrototypeOf
-   *
-   * This should work,
-   * but doesn't because you can't redefine the prototype in this way
-   * `LazySingleton.prototype = Object.create(BaseClass.prototype);`
-   *
-   * setPrototypeOf is not typically optimized in modern browser engines
-   * or js engines, so this will require some benchmarking to ensure it's not
-   * degrading the performance of consuming apps
-   * */
-
-  /* Object.setPrototypeOf(LazySingleton, BaseClass.prototype); */
-
-  return LazySingleton;
+  return new LazySingleton();
 }
 
-export default SingletonFactory;
+export default LazySingletonFactory;

@@ -1,1 +1,1 @@
-export { guard, guardPromise } from './guard/index.js';
+export { lsw, lswAsync } from './lsw/index.js';

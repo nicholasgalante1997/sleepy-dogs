@@ -5,7 +5,7 @@ import { SafeFunction, SafeFunctionState, AsyncSafeFunction } from '../../types/
 import SafeInvocation from '../../models/Invoke/Invoke.js';
 
 /**
- * ### guard
+ * ### lazySafeWrap
  * ---
  * 
  * A part of sleepy functional programming patterns
@@ -29,19 +29,8 @@ import SafeInvocation from '../../models/Invoke/Invoke.js';
  *  }
  * ```
  * 
- * ### usage 
- * 
- * ```js
- * import { readFileSync } from 'node:fs';
- * import { guard } from 'sleepydogs';
- * 
- * const guardedRead = guard(readFileSync);
- * const { data, error } = guardedRead('hello.txt', { encoding: 'utf8' }); // Won't throw on Error
- * console.log(data); // Hello World
- * ```
- * 
  */
-export function guard<R = any>(callback: Callback<R>): SafeFunction<R> {
+export function lsw<R = any>(callback: Callback<R>): SafeFunction<R> {
   let safeCallback = function (...args: any[]) {
     const result = SafeInvocation.execute((() => callback(...args)) as Callback<R>);
     const { data, error, status } = result;
@@ -65,7 +54,32 @@ export function guard<R = any>(callback: Callback<R>): SafeFunction<R> {
   return safeCallback;
 }
 
-export function guardPromise<R = any>(callback: Callback<Promise<R>>): AsyncSafeFunction<R> {
+/**
+ * ### lazySafeWrapAsync
+ * ---
+ * 
+ * A part of sleepy functional programming patterns
+ * 
+ * Wraps an asynchronous function that might fail (throw) and returns a safe function,
+ * which will return a CompleteOperation as opposed to throwing on error
+ * 
+ * A CompleteOperation<T> takes the following shape:
+ * 
+ * ```ts
+ *  enum SafeFunctionState {
+ *    FAILED,
+ *    SUCCEEDED,
+ *    IDLE
+ *  }
+ * 
+ *  type CompleteOperation<T> {
+ *     data: T | null,
+ *     error: Error | null,
+ *     state: SafeFunctionState
+ *  }
+ * ```
+ */
+export function lswAsync<R = any>(callback: Callback<Promise<R>>): AsyncSafeFunction<R> {
   let safeAsyncCallback = async function (...args: any[]) {
     const result = await SafeInvocation.executeAsync(
       (async () => await callback(...args)) as Callback<Promise<R>>

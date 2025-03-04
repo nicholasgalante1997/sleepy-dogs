@@ -1,4 +1,4 @@
-import { guard as guard_fn, guardPromise as guardPromise_fn } from './functions/index.js';
+import { lsw, lswAsync } from './functions/index.js';
 
 import { Attempt as SleepyAttempt } from './models/Attempt/index.js';
 import { default as SleepyBenchmark } from './models/Benchmark/Benchmark.js';
@@ -19,8 +19,8 @@ namespace sleepy {
   export const LazySingleton = SleepyLazySingleton;
   export const Timer = SleepyTimer;
 
-  export const guard = guard_fn;
-  export const guardPromise = guardPromise_fn;
+  export const lazySafeWrap = lsw;
+  export const lazySafeWrapAsync = lswAsync;
 }
 
 export default sleepy;
@@ -34,6 +34,7 @@ export const Signal = SleepySignal;
 export const Timer = SleepyTimer;
 export const LazySingleton = SleepyLazySingleton;
 
-export const guard = guard_fn;
+export const lazySafeWrap = lsw;
+export const lazySafeWrapAsync = lswAsync;
 
 export * from './index.types.js';

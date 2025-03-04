@@ -1,9 +1,9 @@
-import SingletonFactory from '../../src/models/LazySingleton/LazySingleton.js';
+import LazySingletonFactory from '../../src/models/LazySingleton/LazySingleton.js';
 
 describe('SingletonFactory', () => {
     test('Creates a singleton', () => {
         class A {};
-        const AProvider = SingletonFactory(A);
+        const AProvider = LazySingletonFactory(A);
 
         const aInstance1 = AProvider.getInstance();
         const aInstance2 = AProvider.getInstance();
@@ -12,7 +12,7 @@ describe('SingletonFactory', () => {
         expect(aInstance1).toStrictEqual<A>(aInstance2);
 
         class B {}
-        const BProvider = SingletonFactory(B);
+        const BProvider = LazySingletonFactory(B);
         
         const bInstance1 = BProvider.getInstance();
 
