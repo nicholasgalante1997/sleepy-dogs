@@ -31,10 +31,26 @@ abstract class SuperLazySingleton<T> {
   public abstract setInstanceArgs(...args: any[]): SuperLazySingleton<T>;
 
   /**
+   * Clears the arguments for creating the instance.
+   */
+  public abstract clearInstanceArgs(): void;
+
+  /**
    * Gets the singleton instance. If not yet created, it will be created with the previously set arguments.
    * @returns {T}
    */
   public abstract getInstance(): T;
+
+  /**
+   * Clears the singleton instance from the member internal state.
+   */
+  public abstract clearInstance(): void;
+
+  /**
+   * Checks if the singleton instance has been created.
+   * @returns {boolean}
+   */
+  public abstract hasInstance(): boolean;
 }
 
 /**
@@ -81,6 +97,28 @@ function LazySingletonFactory<T1>(BaseClass: Constructable<T1>): SuperLazySingle
         this.instance = new BaseClass(...this.args);
       }
       return this.instance;
+    }
+
+    /**
+     * Checks if the singleton instance has been created.
+     * @returns {boolean}
+     */
+    public hasInstance(): boolean {
+      return this.instance != null;
+    }
+
+    /**
+     * Clears the singleton instance from the member internal state.
+     */
+    public clearInstance(): void {
+      this.instance = null;
+    }
+
+    /**
+     * Clears the arguments for creating the instance.
+     */
+    public clearInstanceArgs(): void {
+      this.args = [];
     }
   }
 

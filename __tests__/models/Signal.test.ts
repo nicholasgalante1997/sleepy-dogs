@@ -1,4 +1,3 @@
-import { mock } from 'node:test';
 import { Signal } from '../../src/models/Signal/Signal.js';
 
 describe('Signal', () => {
@@ -45,7 +44,46 @@ describe('Signal', () => {
     });
     test('Nested dependency in Computed Signal', () => {
         const $num = new Signal.State(22);
-        const $num2 = new Signal.Computed(() => $num.get() * 2);
-        const $str = new Signal.Computed(() => `The number is ${$num2.get()}`);
+        const isEvenComputedSignalMock = jest.fn(() => ($num.get() % 2) === 0);
+        const $isEven = new Signal.Computed(isEvenComputedSignalMock);
+        const strComputedSignalMock = jest.fn(() => `The number is even: ${$isEven.get()}`);
+        const $str = new Signal.Computed(strComputedSignalMock);
+
+        expect($num.get()).toBe(22);
+        expect(isEvenComputedSignalMock).toHaveBeenCalledTimes(0);
+        expect(strComputedSignalMock).toHaveBeenCalledTimes(0);
+
+        expect($str.get()).toBe('The number is even: true');
+        expect(isEvenComputedSignalMock).toHaveBeenCalledTimes(1);
+        expect(strComputedSignalMock).toHaveBeenCalledTimes(1);
+
+        /** Uses cached computation */
+        expect($str.get()).toBe('The number is even: true');
+        expect(isEvenComputedSignalMock).toHaveBeenCalledTimes(1);
+        expect(strComputedSignalMock).toHaveBeenCalledTimes(1);
+
+        $num.set($num.get() + 2);
+
+        expect($num.get()).toBe(24);
+
+        expect($isEven.get()).toBeTruthy();
+        expect(isEvenComputedSignalMock).toHaveBeenCalledTimes(2);
+        expect(strComputedSignalMock).toHaveBeenCalledTimes(1);
+
+        expect($str.get()).toBe('The number is even: true');
+        expect(isEvenComputedSignalMock).toHaveBeenCalledTimes(2);
+        expect(strComputedSignalMock).toHaveBeenCalledTimes(1);
+
+        $num.set($num.get() + 1);
+
+        expect($num.get()).toBe(25);
+
+        expect($isEven.get()).toBeFalsy();
+        expect(isEvenComputedSignalMock).toHaveBeenCalledTimes(3);
+        expect(strComputedSignalMock).toHaveBeenCalledTimes(1);
+
+        expect($str.get()).toBe('The number is even: false');
+        expect(isEvenComputedSignalMock).toHaveBeenCalledTimes(3);
+        expect(strComputedSignalMock).toHaveBeenCalledTimes(2);
     })
 })

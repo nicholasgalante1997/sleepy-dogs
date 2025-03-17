@@ -1,5 +1,5 @@
 import { ISignal } from '../../types/Signal/Signal.js';
-import { SignalGraphManagerProvider } from './GraphManager.js';
+import { EffectGraphManagerProvider, SignalGraphManagerProvider } from './GraphManager.js';
 import { SignalReferenceIdManagerProvider } from './ReferenceId.js';
 import { SignalSharedComputationContextProvider } from './SharedComputationContext.js';
 
@@ -13,6 +13,8 @@ export namespace Signal {
     /**
      * Previous states that the Signal held,
      * through this we can derive generations
+     *
+     * @todo replace with LRUCache
      */
     protected __lost_states__: T[] = [];
 
@@ -40,7 +42,7 @@ export namespace Signal {
   export class State<T> extends BaseSignal<T> implements ISignal.IState<T> {
     constructor(
       private value: T,
-      private options?: ISignal.SignalOptions<T>
+      options?: ISignal.SignalOptions<T>
     ) {
       super(options);
       const signalGraphManager = SignalGraphManagerProvider.getInstance();
@@ -168,7 +170,7 @@ export namespace Signal {
        */
       bridge.pop();
 
-      /**!
+      /**
        * Return our computed value
        */
       return this.value;
@@ -196,9 +198,41 @@ export namespace Signal {
     }
   }
 
-  function createEffect(effect: () => void) {}
-
-  class Effect {
-    constructor(public effect: () => void) {}
+  export function createEffect(effect: () => void) {
+    new Effect(effect);
   }
+
+  export class Effect  {
+    private internalComputationReference: Computed<null>;
+    private internalComputationSymbol: symbol;
+    
+    constructor(public effect: () => void) {
+      const callback = () => {
+        this.effect();
+        return null;
+      };
+
+      const options: ISignal.SignalOptions<null> = {
+        equals: (a, b) => {
+          return false;
+        }
+      };
+
+      this.internalComputationReference = new Computed(callback, options);
+      this.internalComputationSymbol = this.internalComputationReference.key;
+
+      const effectGraphManager = EffectGraphManagerProvider.getInstance();
+      effectGraphManager.registerEffect(this);
+    }
+
+    getSymbol(): symbol {
+      return this.internalComputationSymbol;
+    }
+
+    getInternalComputedReference(): Computed<null> {
+      return this.internalComputationReference;
+    }
+  }
+
+  function startEffectsSchedulingEngine() {}
 }
