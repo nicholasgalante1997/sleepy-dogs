@@ -1,11 +1,33 @@
 {
   "name": "sleepydogs",
   "version": "1.0.8-alpha.3",
+  "author": "Nick Galante <rustycloud42@protonmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nicholasgalante1997/sleepy-dogs.git"
+  },
+  "bugs": {
+    "email": "rustycloud42@protonmail.com",
+    "url": "https://github.com/nicholasgalante1997/sleepy-dogs/issues"
+  },
+  "license": "./LICENSE",
+  "keywords": [
+    "Utilities",
+    "Abstractions",
+    "Patterns",
+    "Reusable",
+    "Object Oriented Programming Patterns",
+    "Signals",
+    "tc39",
+    "Singletons",
+    "Options"
+  ],
   "module": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "type": "module",
   "files": [
     "dist",
+    "LICENSE",
     "package.json"
   ],
   "exports": {
@@ -75,9 +97,6 @@
     "release": "release-it",
     "serve-docs": "docsify serve ./docs -p 3000"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",
