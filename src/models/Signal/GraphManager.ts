@@ -1,23 +1,6 @@
+import LazySingletonFactory from '../LazySingleton/LazySingleton.js';
 import Graph from './Graph.js';
 import { Signal } from './Signal.js';
-
-// TODO use lazy singleton you fuck
-
-export class SignalGraphManagerProvider {
-  private static graphManager: SignalGraphManager;
-  constructor() {
-    throw new Error(
-      'ProviderClassInstantiationException: Providers cannot be instantiated directly. Use getInstance() to retrieve a valid instance of the SignalGraphManager class.'
-    );
-  }
-  static getInstance() {
-    if (SignalGraphManagerProvider.graphManager == null) {
-      SignalGraphManagerProvider.graphManager = new SignalGraphManager();
-    }
-
-    return SignalGraphManagerProvider.graphManager;
-  }
-}
 
 export class SignalGraphManager {
   graph: Graph<symbol>;
@@ -53,7 +36,7 @@ export class SignalGraphManager {
   }
 }
 
-class EffectGraphManager {
+export class EffectGraphManager {
   private _graph: Graph<symbol>;
   private _record: Map<symbol, Signal.Computed<null>>;
   private _effects: Set<Signal.Effect>;
@@ -71,6 +54,13 @@ class EffectGraphManager {
     this._effects.add(effect);
   }
 
+  unregisterEffect(effect: Signal.Effect): void {
+    const key = effect.getSymbol();
+    this._graph.removeVertex(key);
+    this._record.delete(key);
+    this._effects.delete(effect);
+  }
+
   getEffectDependencies(effect: Signal.Effect): (Signal.State<any> | Signal.Computed<any>)[] {
     const key = effect.getSymbol();
     const signal = effect.getInternalComputedReference();
@@ -78,32 +68,63 @@ class EffectGraphManager {
     return dependencies;
   }
 
-  get effects (): Set<Signal.Effect> {
+  /** 
+   * TODO there's likely a more optimized way to do this.
+   */
+  dispatchCascadedUpdate(signalId: symbol): void {
+    const signalGraphManager = SignalGraphManagerProvider.getInstance();
+    const dirtySignal = signalGraphManager.record.get(signalId);
+
+    if (dirtySignal === undefined) {
+      /**
+       * We have an unregistered signal,
+       * this represents a systemic bug in the signal graph,
+       * and we cannot handle it gracefully or move further.
+       */
+      return;
+    }
+
+    const effects = this.effects;
+
+    for (const effect of effects) {
+      const dependencies = this.getEffectDependencies(effect);
+      this.traverseEffectDependenciesAndReRunIfDirty(effect, dirtySignal, dependencies);
+    }
+  }
+
+  get effects(): Set<Signal.Effect> {
     return this._effects;
   }
 
-  get graph (): Graph<symbol> {
+  get graph(): Graph<symbol> {
     return this._graph;
   }
 
-  get record (): Map<symbol, Signal.Computed<null>> {
+  get record(): Map<symbol, Signal.Computed<null>> {
     return this._record;
   }
-}
 
-
-export class EffectGraphManagerProvider {
-  private static graphManager: EffectGraphManager;
-  constructor() {
-    throw new Error(
-      'ProviderClassInstantiationException: Providers cannot be instantiated directly. Use getInstance() to retrieve a valid instance of the SignalGraphManager class.'
-    );
-  }
-  static getInstance() {
-    if (EffectGraphManagerProvider.graphManager == null) {
-      EffectGraphManagerProvider.graphManager = new EffectGraphManager();
+  private traverseEffectDependenciesAndReRunIfDirty(effect: Signal.Effect, dirtySignal: (Signal.Computed<any> | Signal.State<any>), dependencies: (Signal.Computed<any> | Signal.State<any>)[]) {
+    if (dependencies.includes(dirtySignal)) {
+      /** 
+       * Schedule the effect to run
+       * We should only need to run the side effect once per dirty signal, in theory
+       */
+      queueMicrotask(effect.callback.bind(effect));
+      return;
+    } else {
+      for (const dependency of dependencies) {
+        const ddeps = SignalGraphManagerProvider.getInstance().getSignalDependencies(dependency);
+        this.traverseEffectDependenciesAndReRunIfDirty(effect, dirtySignal, ddeps);
+      }
     }
-
-    return EffectGraphManagerProvider.graphManager;
   }
 }
+
+const SignalGraphManagerProvider: ReturnType<typeof LazySingletonFactory<SignalGraphManager>> =
+  LazySingletonFactory(SignalGraphManager);
+
+const EffectGraphManagerProvider: ReturnType<typeof LazySingletonFactory<EffectGraphManager>> =
+  LazySingletonFactory(EffectGraphManager);
+
+export { SignalGraphManagerProvider, EffectGraphManagerProvider };

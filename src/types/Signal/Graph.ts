@@ -15,6 +15,12 @@ export default interface IGraph<Vertex> {
    */
   addVertex(vertex: Vertex): void;
 
+  /**
+   * Removes a node from the graph
+   * @param vertex 
+   */
+  removeVertex(vertex: Vertex): void;
+
   /** 
    * Adds an edge between two nodes to the graph
    * 

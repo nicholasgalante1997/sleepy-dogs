@@ -6,7 +6,7 @@ import { SignalSharedComputationContextProvider } from './SharedComputationConte
 export namespace Signal {
   abstract class BaseSignal<T> {
     /**
-     * Used for indexing Signals in SharedComputationContext and SignalGraph
+     * A unique identifier for each [Signal, Effect]
      */
     public readonly key: symbol;
 
@@ -14,7 +14,7 @@ export namespace Signal {
      * Previous states that the Signal held,
      * through this we can derive generations
      *
-     * @todo replace with LRUCache
+     * @todo replace with LRUCache, or CAP @ certain element count.
      */
     protected __lost_states__: T[] = [];
 
@@ -166,7 +166,7 @@ export namespace Signal {
       }
 
       /**
-       * Clean up the StateBridge computation context
+       * Clean up the bridge computation context
        */
       bridge.pop();
 
@@ -199,16 +199,24 @@ export namespace Signal {
   }
 
   export function createEffect(effect: () => void) {
-    new Effect(effect);
+    let e = new Effect(effect);
+
+    return () => {
+      
+    };
   }
 
-  export class Effect  {
+  export class Effect {
     private internalComputationReference: Computed<null>;
     private internalComputationSymbol: symbol;
-    
-    constructor(public effect: () => void) {
-      const callback = () => {
-        this.effect();
+
+    private _effect: () => void;
+    public callback: () => null;
+
+    constructor(effect: () => void) {
+      this._effect = effect;
+      this.callback = () => {
+        this._effect();
         return null;
       };
 
@@ -218,7 +226,7 @@ export namespace Signal {
         }
       };
 
-      this.internalComputationReference = new Computed(callback, options);
+      this.internalComputationReference = new Computed(this.callback, options);
       this.internalComputationSymbol = this.internalComputationReference.key;
 
       const effectGraphManager = EffectGraphManagerProvider.getInstance();
@@ -233,6 +241,4 @@ export namespace Signal {
       return this.internalComputationReference;
     }
   }
-
-  function startEffectsSchedulingEngine() {}
 }

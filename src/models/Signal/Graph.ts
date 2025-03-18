@@ -30,6 +30,13 @@ export default class Graph<V> implements IGraph<V> {
     this.adjacencyList.set(vertex, []);
   }
 
+  removeVertex(vertex: V): void {
+    if (this.adjacencyList.has(vertex)) this.adjacencyList.delete(vertex);
+    for (const [k, v] of this.adjacencyList.entries()) {
+      this.adjacencyList.set(k, v.filter((r) => r.provider !== vertex && r.dependent !== vertex));
+    }
+  }
+
   /**
    * Adds an edge between two nodes to the graph
    * 

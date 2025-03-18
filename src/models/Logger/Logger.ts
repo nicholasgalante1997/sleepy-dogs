@@ -39,6 +39,9 @@ type SleepyLogOptions = {
       };
 };
 
+/**
+ * @deprecated Use `debug` instead.
+ */
 export namespace Log {
   export function factory(options: SleepyLogOptions = {}) {
     return new Proxy(console, {

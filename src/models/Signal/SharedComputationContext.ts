@@ -1,3 +1,4 @@
+import { default as LazySingletonFactory } from '../LazySingleton/LazySingleton.js';
 import { Signal } from './Signal.js';
 
 export class SignalSharedComputationContextStack {
@@ -15,17 +16,17 @@ export class SignalSharedComputationContextStack {
   pop() {
     if (this.computationContextsStack.length === 0) return;
     const lastItem = this.computationContextsStack.at(-1);
-    this.computationContextsStack = this.computationContextsStack.slice(0, -1);
+    this.computationContextsStack = this.computationContextsStack.slice(
+      0,
+      this.computationContextsStack.indexOf(lastItem!)
+    );
     return lastItem;
   }
 }
 
-export class SignalSharedComputationContextProvider {
-  private static signalInternalStateBridge: SignalSharedComputationContextStack;
-  static getInstance() {
-    if (SignalSharedComputationContextProvider.signalInternalStateBridge == null) {
-      SignalSharedComputationContextProvider.signalInternalStateBridge = new SignalSharedComputationContextStack();
-    }
-    return SignalSharedComputationContextProvider.signalInternalStateBridge;
-  }
-}
+const SignalSharedComputationContextProvider: ReturnType<
+  typeof LazySingletonFactory<SignalSharedComputationContextStack>
+> = LazySingletonFactory(SignalSharedComputationContextStack);
+
+export default SignalSharedComputationContextProvider;
+export { SignalSharedComputationContextProvider };

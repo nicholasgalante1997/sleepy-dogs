@@ -1,4 +1,5 @@
-/** TODO: Keys should be Symbols */
+import { default as LazySingletonFactory } from '../LazySingleton/LazySingleton.js';
+
 export class SignalRefenceIdManager {
   getIdRef() {
     const key = Symbol('signal.key');
@@ -6,14 +7,8 @@ export class SignalRefenceIdManager {
   }
 }
 
-export class SignalReferenceIdManagerProvider {
-  private static signalReferenceIdManager: SignalRefenceIdManager;
-  static getInstance() {
-    if (SignalReferenceIdManagerProvider.signalReferenceIdManager == null) {
-      SignalReferenceIdManagerProvider.signalReferenceIdManager = new SignalRefenceIdManager();
-    }
-    return SignalReferenceIdManagerProvider.signalReferenceIdManager;
-  }
-}
+const SignalReferenceIdManagerProvider: ReturnType<typeof LazySingletonFactory<SignalRefenceIdManager>> =
+  LazySingletonFactory(SignalRefenceIdManager);
 
-export class EffectReferenceIdManager {}
+export default SignalReferenceIdManagerProvider;
+export { SignalReferenceIdManagerProvider };

@@ -1,5 +1,5 @@
-/** 
- * @type {import('ts-jest').JestConfigWithTsJest} 
+/**
+ * @type {import('ts-jest').JestConfigWithTsJest}
  * @see https://stackoverflow.com/questions/73735202/typescript-jest-imports-with-js-extension-cause-error-cannot-find-module
  * */
 module.exports = {
@@ -18,15 +18,15 @@ module.exports = {
     }
   },
   transform: {
-      '\\.[jt]sx?$': 'ts-jest'
+    '\\.[jt]sx?$': 'ts-jest'
   },
   globals: {
-      'ts-jest': {
-          useESM: true
-      }
+    'ts-jest': {
+      useESM: true
+    }
   },
   moduleNameMapper: {
-      '(.+)\\.js': '$1'
+    '(.+)\\.js': '$1'
   },
   extensionsToTreatAsEsm: ['.ts'],
   testMatch: ['<rootDir>/__tests__/**/*.test.ts']
