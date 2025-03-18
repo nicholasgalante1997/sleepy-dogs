@@ -1,6 +1,6 @@
 {
   "name": "sleepydogs",
-  "version": "1.0.8-alpha.2",
+  "version": "1.0.8-alpha.3",
   "module": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "type": "module",
